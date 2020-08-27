@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+import 'package:startup_namer/ChoosenNames.dart';
+import 'package:startup_namer/WordPairModel.dart';
 
 void main() => runApp(MyApp());
 
@@ -34,6 +36,7 @@ class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
   final _saved = Set<WordPair>();
   final _biggerFont = TextStyle(fontSize: 18.0);
+  var wpModel = new WordPairModel();
 
   Widget _buildSuggestions(){
     return ListView.builder(
@@ -57,7 +60,7 @@ class _RandomWordsState extends State<RandomWords> {
   }
 
   Widget _buildRow(WordPair pair){
-    final alreadySaved = _saved.contains(pair);
+    final alreadySaved = wpModel.saved.contains(pair);
     return ListTile(
       title: Text(
         pair.asPascalCase,
@@ -70,43 +73,49 @@ class _RandomWordsState extends State<RandomWords> {
       onTap: () {
         setState(() {
           if (alreadySaved){
-            _saved.remove(pair);
+            wpModel.removeItem(pair);
           } else {
-            _saved.add(pair);
+            wpModel.addListItem(pair);
           }
         });
       },
     );
   }
 
-  void _pushSaved(){
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-          builder: (BuildContext context){
-            final tiles = _saved.map(
-              (WordPair pair) {
-                return ListTile(
-                  title: Text(
-                    pair.asPascalCase,
-                    style: _biggerFont,
-                  ),
-                );
-              },
-            );
-            final divided = ListTile.divideTiles(
-              context: context,
-              tiles: tiles
-            ).toList();
+//  void _pushSaved(){
+//    Navigator.of(context).push(
+//      MaterialPageRoute<void>(
+//          builder: (BuildContext context){
+//            final tiles = wpModel.saved.map<Widget>(
+//              (WordPair pair) {
+//                return ListTile(
+//                  title: Text(
+//                    pair.asPascalCase,
+//                    style: _biggerFont,
+//                  ),
+//                );
+//              },
+//            );
+//            final divided = ListTile.divideTiles(
+//              context: context,
+//              tiles: tiles
+//            ).toList();
+//
+//            return Scaffold(
+//              appBar: AppBar(
+//                title: Text('Saved suggestions'),
+//              ),
+//              body: ListView(children: divided),
+//            );
+//          },
+//      )
+//    );
+//  }
 
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Saved suggestions'),
-              ),
-              body: ListView(children: divided),
-            );
-          },
-      )
-    );
+  void _pushSaved(){
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) => ChoosenNames()
+    ));
   }
 
   @override
