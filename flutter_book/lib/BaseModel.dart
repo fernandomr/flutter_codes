@@ -21,5 +21,5 @@ class BaseModel extends Model {
     stackIndex = inStackIndex;
     notifyListeners();
   }
-  
+
 }
