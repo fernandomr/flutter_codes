@@ -55,4 +55,30 @@ class NotesDbWorker {
     return pMap;
   }
 
+  Future create(Note pNote) async{
+    Database db = await database;
+    var val = await db.rawQuery("SELECT MAX(id)+1 AS id FROM notes");
+    int id = val.first["id"];
+    if (id == null) {
+      id = 1;
+    }
+
+    return await db.rawInsert("insert into notes (id, title, content, color) "
+    "values (?, ?, ?, ?)",
+    [id, pNote.title, pNote.content, pNote.color]);
+  }
+
+  Future<Note> get(int id) async {
+    Database db = await database;
+    var res = await db.query("notes", where: "id = ?", whereArgs: [id]);
+    return noteFromMap(res.first);
+  }
+
+  Future<List> getAll() async {
+    Database db = await database;
+    var res = await db.query("notes");
+    var resList = res.isNotEmpty ? res.map((e) => noteFromMap(e)).toList() : [];
+    return resList;
+  }
+
 }
