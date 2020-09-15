@@ -7,6 +7,41 @@ import "NotesDBWorker.dart";
 import "NotesModel.dart" show Note, NotesModel, notesModel;
 
 class NotesList extends StatelessWidget {
+
+  Future _deleteNote(BuildContext context, Note note){
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext alertContext){
+        return AlertDialog(
+          title: Text("Delete note"),
+          content: Text("Are you sure you want to delete this note?"),
+          actions: [
+            FlatButton(child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(alertContext).pop();
+              },
+            ),
+            FlatButton(child: Text("Delete"),
+              onPressed: () async {
+                await NotesDbWorker.db.delete(note.id);
+                Navigator.of(alertContext).pop();
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: Colors.red,
+                      duration: Duration(seconds: 2),
+                      content: Text("Note deleted")
+                  )
+                );
+                notesModel.loadData("notes", NotesDbWorker.db);
+              },
+            ),
+          ],
+        );
+      }
+    );
+  }
+
   Widget build(BuildContext context){
     return ScopedModel<NotesModel>(model: notesModel,
         child: ScopedModelDescendant<NotesModel>(
@@ -33,6 +68,35 @@ class NotesList extends StatelessWidget {
                     case "grey" : color = Colors.grey; break;
                     case "purple" : color = Colors.purple; break;
                   }
+
+                  return Container(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    child: Slidable(
+                      delegate: SlidableDrawerDelegate(),
+                      actionExtentRatio: .25,
+                      secondaryActions: [
+                        IconSlideAction(
+                          caption: "Delete",
+                          color: Colors.red,
+                          icon: Icons.delete,
+                          onTap: () => _deleteNote(context, note),
+                        )
+                      ],
+                      child: Card(
+                        elevation: 8,
+                        color: color,
+                        child: ListTile(
+                          title: Text("${note.title}"),
+                          subtitle: Text("${note.content}"),
+                          onTap: () async {
+                            notesModel.entityBeingEdited = await NotesDbWorker.db.get(note.id);
+                            notesModel.setColor(notesModel.entityBeingEdited.color);
+                            notesModel.setStackIndex(1);
+                          },
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
             );
