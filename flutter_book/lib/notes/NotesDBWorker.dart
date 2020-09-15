@@ -2,7 +2,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../utils.dart' as utils;
-import 'notesModel.dart';
+import 'NotesModel.dart';
 
 class NotesDbWorker {
 
@@ -79,6 +79,17 @@ class NotesDbWorker {
     var res = await db.query("notes");
     var resList = res.isNotEmpty ? res.map((e) => noteFromMap(e)).toList() : [];
     return resList;
+  }
+
+  Future update(Note pNote) async{
+    Database db = await database;
+    return await db.update("notes", noteToMap(pNote),
+      where: "id = ?", whereArgs: [pNote.id]);
+  }
+
+  Future delete(int id) async{
+    Database db = await database;
+    return await db.delete("notes", where: "id = ?", whereArgs: [id]);
   }
 
 }

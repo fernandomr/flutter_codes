@@ -9,7 +9,7 @@ import "NotesModel.dart" show NotesModel, notesModel;
 class Notes extends StatelessWidget{
 
   Notes(){
-    notesModel.loadData("notes", NotesDBWorker.db);
+    notesModel.loadData("notes", NotesDbWorker.db);
   }
 
   Widget build(BuildContext context){

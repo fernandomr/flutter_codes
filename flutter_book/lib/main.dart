@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'appointments/appointments.dart';
 import 'contacts/contacts.dart';
-import 'notes/notes.dart';
+import 'notes/Notes.dart';
 import 'tasks/tasks.dart';
 import 'utils.dart' as utils;
 
