@@ -8,19 +8,18 @@ import 'tasks/tasks.dart';
 import 'utils.dart' as utils;
 
 void main() {
-
-  startMeUp() async{
-    Directory docsDir = await getApplicationDocumentsDirectory();
-    utils.docsDir = docsDir;
-    runApp(FlutterBook());
-  }
-
-  startMeUp();
+  runApp(FlutterBook());
 }
 
 class FlutterBook extends StatelessWidget {
 
+  startMeUp() async{
+    Directory docsDir = await getApplicationDocumentsDirectory();
+    utils.docsDir = docsDir;
+  }
+
   Widget build(BuildContext context){
+    startMeUp();
     return MaterialApp(
       home: DefaultTabController(
         length: 4,

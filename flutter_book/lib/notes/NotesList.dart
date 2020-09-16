@@ -1,8 +1,8 @@
 
 import "package:flutter/material.dart";
 import 'package:flutter_book/notes/NotesModel.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import "package:scoped_model/scoped_model.dart";
-import "package:flutter_slidable/flutter_slidable.dart";
 import "NotesDBWorker.dart";
 import "NotesModel.dart" show Note, NotesModel, notesModel;
 
@@ -72,7 +72,7 @@ class NotesList extends StatelessWidget {
                   return Container(
                     padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
                     child: Slidable(
-                      delegate: SlidableDrawerDelegate(),
+                      // delegate: SlidableDrawerDelegate,
                       actionExtentRatio: .25,
                       secondaryActions: [
                         IconSlideAction(
