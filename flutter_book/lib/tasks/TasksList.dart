@@ -1,11 +1,12 @@
 
 import "package:flutter/material.dart";
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 import "package:scoped_model/scoped_model.dart";
 import "TasksDBWorker.dart";
 import "TasksModel.dart" show Task, TasksModel, tasksModel;
 
-class NotesList extends StatelessWidget {
+class TasksList extends StatelessWidget {
 
   Future _deleteTask(BuildContext context, Task task){
     return showDialog(
@@ -50,51 +51,72 @@ class NotesList extends StatelessWidget {
                 child: Icon(Icons.add, color: Colors.white),
                 onPressed: (){
                   tasksModel.entityBeingEdited = Task();
-                  tasksModel.setColor(null);
                   tasksModel.setStackIndex(1);
                 },
               ),
               body: ListView.builder(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                 itemCount: tasksModel.entityList.length,
                 itemBuilder: (BuildContext context, int index) {
-                  Task note = tasksModel.entityList[index];
-                  Color color = Colors.white;
-                  switch(note.color){
-                    case "red" : color = Colors.red; break;
-                    case "green" : color = Colors.green; break;
-                    case "blue" : color = Colors.blue; break;
-                    case "yellow" : color = Colors.yellow; break;
-                    case "grey" : color = Colors.grey; break;
-                    case "purple" : color = Colors.purple; break;
+                  Task task = tasksModel.entityList[index];
+                  String sDueDate;
+                  if (task.dueDate != null){
+                    List dateParts = task.dueDate.split(",");
+                    DateTime dueDate = DateTime(int.parse(dateParts[0]),
+                      int.parse(dateParts[1]), int.parse(dateParts[2]));
+                    sDueDate = DateFormat.yMMMMd("en_US").format(dueDate.toLocal());
                   }
 
-                  return Container(
-                    padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                    child: Slidable(
-                      // delegate: SlidableDrawerDelegate,
+                  return Slidable(
                       actionExtentRatio: .25,
-                      secondaryActions: [
-                        IconSlideAction(
-                          caption: "Delete",
-                          color: Colors.red,
-                          icon: Icons.delete,
-                          onTap: () => _deleteTask(context, note),
-                        )
-                      ],
-                      child: Card(
-                        elevation: 8,
-                        color: color,
-                        child: ListTile(
-                          title: Text("${note.title}"),
-                          subtitle: Text("${note.content}"),
-                          onTap: () async {
-                            tasksModel.entityBeingEdited = await NotesDbWorker.db.get(note.id);
-                            tasksModel.setColor(tasksModel.entityBeingEdited.color);
-                            tasksModel.setStackIndex(1);
+                      actionPane: null,
+                      child: ListTile(
+                        leading: Checkbox(
+                          value: task.completed == "true" ? true : false,
+                          onChanged: (value) async {
+                            task.completed = value.toString();
+                            await TasksDBWorker.db.update(task);
+                            tasksModel.loadData("tasks", TasksDBWorker.db);
                           },
                         ),
+                        title: Text(
+                          "${task.description}",
+                          style: task.completed == "true" ?
+                            TextStyle(color: Theme.of(context).disabledColor,
+                              decoration: TextDecoration.lineThrough
+                            )
+                              : TextStyle(color: Theme.of(context).textTheme.title.color)
+                        ),
+                        subtitle: task.dueDate == null ? null :
+                          Text(
+                            sDueDate,
+                            style: task.completed == "true" ?
+                            TextStyle(color: Theme.of(context).disabledColor,
+                                decoration: TextDecoration.lineThrough
+                            )
+                                : TextStyle(color: Theme.of(context).textTheme.title.color),
+                          ),
+                        onTap: () async {
+                          if (task.completed == "true") {
+                            return;
+                          }
+                          tasksModel.entityBeingEdited = await TasksDBWorker.db.get(task.id);
+                          if (tasksModel.entityBeingEdited.dueDate == null){
+                            tasksModel.setChosenDate(null);
+                          } else {
+                            tasksModel.setChosenDate(sDueDate);
+                          }
+                          tasksModel.setStackIndex(1);
+                        },
                       ),
-                    ),
+                    secondaryActions: [
+                      IconSlideAction(
+                        caption: "Delete",
+                        color: Colors.red,
+                        icon: Icons.delete,
+                        onTap: () => _deleteTask(context, task),
+                      )
+                    ],
                   );
                 },
               ),
