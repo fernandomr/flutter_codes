@@ -45,6 +45,35 @@ class AppointmentsList extends StatelessWidget {
     );
   }
 
+  void _showAppointments(DateTime date, BuildContext context) async{
+    showModalBottomSheet(context: context,
+        builder: (BuildContext context){
+          return ScopedModel<AppointmentsModel>(
+              model: appointmentsModel,
+              child: ScopedModelDescendant<AppointmentsModel>(
+                builder: (BuildContext context, Widget child, AppointmentsModel model){
+                  return Scaffold(
+                    body: Container(child: Padding(padding: EdgeInsets.all(10),
+                    child: GestureDetector(
+                      child: Column(
+                        children: [
+                          Text(DateFormat.yMMMMd("en_US").format(date.toLocal()),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Theme.of(context).accentColor, fontSize : 24),
+                          ),
+                          Divider(),
+                        ],
+                      ),
+                    ),
+                    ),
+                    ),
+                  );
+                },
+              ));
+        }
+    );
+  }
+
   Widget build(BuildContext context){
     EventList<Event> _markedDateMap = EventList();
 
@@ -73,7 +102,23 @@ class AppointmentsList extends StatelessWidget {
                 appointmentsModel.setStackIndex(1);
               },
             ),
-            body: Column(),
+            body: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    child: CalendarCarousel<Event>(
+                      thisMonthDayBorderColor: Colors.grey,
+                      daysHaveCircularBorder: false,
+                      markedDatesMap: _markedDateMap,
+                      onDayPressed: (DateTime value, List<Event> inEvents){
+                        _showAppointments(value, context);
+                      },
+                    )
+                  )
+                )
+              ]
+            ),
           );
         },
       ),
