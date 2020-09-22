@@ -1,5 +1,8 @@
 
 import "package:flutter/material.dart";
+import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
+import 'package:flutter_calendar_carousel/classes/event.dart';
+import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import "package:scoped_model/scoped_model.dart";
@@ -8,7 +11,7 @@ import "AppointmentsModel.dart" show Appointments, AppointmentsModel, appointmen
 
 class AppointmentsList extends StatelessWidget {
 
-  Future _deleteTask(BuildContext context, Appointments task){
+  Future _deleteAppointment(BuildContext context, Appointments task){
     return showDialog(
         context: context,
         barrierDismissible: false,
@@ -43,86 +46,15 @@ class AppointmentsList extends StatelessWidget {
   }
 
   Widget build(BuildContext context){
-    return ScopedModel<AppointmentsModel>(model: appointmentsModel,
-        child: ScopedModelDescendant<AppointmentsModel>(
-          builder: (BuildContext context, Widget inChild, AppointmentsModel inModel){
-            return Scaffold(
-              floatingActionButton: FloatingActionButton(
-                child: Icon(Icons.add, color: Colors.white),
-                onPressed: (){
-                  appointmentsModel.entityBeingEdited = Appointments();
-                  appointmentsModel.setStackIndex(1);
-                },
-              ),
-              body: ListView.builder(
-                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                itemCount: appointmentsModel.entityList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  Appointments task = appointmentsModel.entityList[index];
-                  String sDueDate;
-                  if (task.dueDate != null){
-                    List dateParts = task.dueDate.split(",");
-                    DateTime dueDate = DateTime(int.parse(dateParts[0]),
-                        int.parse(dateParts[1]), int.parse(dateParts[2]));
-                    sDueDate = DateFormat.yMMMMd("en_US").format(dueDate.toLocal());
-                  }
+    EventList<Event> _markedDateMap = EventList();
 
-                  return Slidable(
-                    actionExtentRatio: .25,
-                    actionPane: null,
-                    child: ListTile(
-                      leading: Checkbox(
-                        value: task.completed == "true" ? true : false,
-                        onChanged: (value) async {
-                          task.completed = value.toString();
-                          await AppointmentsDBWorker.db.update(task);
-                          appointmentsModel.loadData("tasks", AppointmentsDBWorker.db);
-                        },
-                      ),
-                      title: Text(
-                          "${task.description}",
-                          style: task.completed == "true" ?
-                          TextStyle(color: Theme.of(context).disabledColor,
-                              decoration: TextDecoration.lineThrough
-                          )
-                              : TextStyle(color: Theme.of(context).textTheme.title.color)
-                      ),
-                      subtitle: task.dueDate == null ? null :
-                      Text(
-                        sDueDate,
-                        style: task.completed == "true" ?
-                        TextStyle(color: Theme.of(context).disabledColor,
-                            decoration: TextDecoration.lineThrough
-                        )
-                            : TextStyle(color: Theme.of(context).textTheme.title.color),
-                      ),
-                      onTap: () async {
-                        if (task.completed == "true") {
-                          return;
-                        }
-                        appointmentsModel.entityBeingEdited = await AppointmentsDBWorker.db.get(task.id);
-                        if (appointmentsModel.entityBeingEdited.dueDate == null){
-                          appointmentsModel.setChosenDate(null);
-                        } else {
-                          appointmentsModel.setChosenDate(sDueDate);
-                        }
-                        appointmentsModel.setStackIndex(1);
-                      },
-                    ),
-                    secondaryActions: [
-                      IconSlideAction(
-                        caption: "Delete",
-                        color: Colors.red,
-                        icon: Icons.delete,
-                        onTap: () => _deleteTask(context, task),
-                      )
-                    ],
-                  );
-                },
-              ),
-            );
-          },
-        )
-    );
+    for(int i = 0; i < appointmentsModel.entityList.length; i++){
+      Appointments appointment = AppointmentsModel().entityList[i];
+      List dateParts = appointment.apptDate.split(",");
+      DateTime apptDate = DateTime(int.parse(dateParts[0]), int.parse(dateParts[1]),int.parse(dateParts[2]));
+      _markedDateMap.add(apptDate, Event(date: apptDate,
+        icon: Container(decoration: BoxDecoration(color: Colors.blue))
+      ));
+    }
   }
 }
