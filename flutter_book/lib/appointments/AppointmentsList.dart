@@ -56,5 +56,27 @@ class AppointmentsList extends StatelessWidget {
         icon: Container(decoration: BoxDecoration(color: Colors.blue))
       ));
     }
+
+    return ScopedModel<AppointmentsModel>(
+      model: appointmentsModel,
+      child: ScopedModelDescendant<AppointmentsModel>(
+        builder: (context, child, model){
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              child : Icon(Icons.add, color : Colors.white),
+              onPressed: () async{
+                appointmentsModel.entityBeingEdited = Appointments();
+                DateTime now = DateTime.now();
+                appointmentsModel.entityBeingEdited.apptDate ="${now.year},${now.month},${now.day}";
+                appointmentsModel.setChosenDate(DateFormat.yMMMMd("en_US").format(now.toLocal()));
+                appointmentsModel.setApptTime(null);
+                appointmentsModel.setStackIndex(1);
+              },
+            ),
+            body: Column(),
+          );
+        },
+      ),
+    );
   }
 }
