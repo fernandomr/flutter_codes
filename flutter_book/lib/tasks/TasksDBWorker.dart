@@ -69,20 +69,20 @@ class TasksDBWorker {
 
   Future<Task> get(int id) async {
     Database db = await database;
-    var res = await db.query("notes", where: "id = ?", whereArgs: [id]);
+    var res = await db.query("tasks", where: "id = ?", whereArgs: [id]);
     return taskFromMap(res.first);
   }
 
   Future<List> getAll() async {
     Database db = await database;
-    var res = await db.query("notes");
+    var res = await db.query("tasks");
     var resList = res.isNotEmpty ? res.map((e) => taskFromMap(e)).toList() : [];
     return resList;
   }
 
   Future update(Task pTask) async{
     Database db = await database;
-    return await db.update("notes", taskToMap(pTask),
+    return await db.update("tasks", taskToMap(pTask),
         where: "id = ?", whereArgs: [pTask.id]);
   }
 
