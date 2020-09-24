@@ -45,6 +45,10 @@ class AppointmentsList extends StatelessWidget {
     );
   }
 
+  void _editAppointment(BuildContext context, Appointments pAppointment){
+    
+  }
+
   void _showAppointments(DateTime date, BuildContext context) async{
     showModalBottomSheet(context: context,
         builder: (BuildContext context){
@@ -62,6 +66,48 @@ class AppointmentsList extends StatelessWidget {
                             style: TextStyle(color: Theme.of(context).accentColor, fontSize : 24),
                           ),
                           Divider(),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: appointmentsModel.entityList.length,
+                              itemBuilder: (BuildContext context, int index){
+                                Appointments appointment = appointmentsModel.entityList[index];
+                                if (appointment.apptDate !="${date.year},${date.month},${date.day}"){
+                                  return Container(height : 0);
+                                }
+                                String apptTime = "";
+                                if (appointment.apptTime != null){
+                                  List timeParts = appointment.apptTime.split(",");
+                                  TimeOfDay at = TimeOfDay(
+                                      hour : int.parse(timeParts[0]),
+                                      minute : int.parse(timeParts[1]));
+                                  apptTime = " (${at.format(context)})";
+                                }
+
+                                return Slidable(
+                                    // delegate : SlidableDrawerDelegate()
+                                  actionExtentRatio: .25,
+                                  child: Container(
+                                    margin: EdgeInsets.only(bottom : 8),
+                                    color : Colors.grey.shade300,
+                                    child: ListTile(
+                                      title : Text("${appointment.title}$apptTime"),
+                                      subtitle : appointment.description == null ? null : Text("${appointment.description}"),
+                                      onTap: () async{
+                                        _editAppointment(context, appointment);
+                                      },
+                                    ),
+                                  ),
+                                  secondaryActions: [
+                                    IconSlideAction(
+                                        caption: "Delete", color: Colors.red,
+                                        icon: Icons.delete,
+                                        onTap: () => _deleteAppointment(context, appointment)
+                                    )
+                                  ],
+                                );
+                              }
+                            )
+                          ),
                         ],
                       ),
                     ),
