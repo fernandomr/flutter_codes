@@ -45,8 +45,32 @@ class AppointmentsList extends StatelessWidget {
     );
   }
 
-  void _editAppointment(BuildContext context, Appointments pAppointment){
-    
+  void _editAppointment(BuildContext context, Appointments pAppointment) async{
+    appointmentsModel.entityBeingEdited = await AppointmentsDBWorker.db.get(pAppointment.id);
+    if (appointmentsModel.entityBeingEdited == null){
+      appointmentsModel.setChosenDate(null);
+    } else {
+      List dateParts = appointmentsModel.entityBeingEdited.apptDate.split(",");
+      DateTime apptDate = DateTime(
+          int.parse(dateParts[0]),
+          int.parse(dateParts[1]),
+          int.parse(dateParts[2])
+      );
+      appointmentsModel.setChosenDate(DateFormat.yMMMMd("en_US").format(apptDate.toLocal()));
+      if (appointmentsModel.entityBeingEdited.apptTime == null){
+        appointmentsModel.setApptTime(null);
+      } else {
+        List timeParts =appointmentsModel.entityBeingEdited.apptTime.split(",");
+        TimeOfDay apptTime = TimeOfDay(
+            hour: int.parse(timeParts[0]),
+            minute: int.parse(timeParts[1])
+        );
+        appointmentsModel.setApptTime(apptTime.format(context));
+      }
+
+      appointmentsModel.setStackIndex(1);
+      Navigator.pop(context);
+    }
   }
 
   void _showAppointments(DateTime date, BuildContext context) async{
