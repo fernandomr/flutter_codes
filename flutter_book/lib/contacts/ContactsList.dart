@@ -6,6 +6,7 @@ import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
+import '../utils.dart' as utils;
 import "package:scoped_model/scoped_model.dart";
 import "ContactsDBWorker.dart";
 import "ContactsModel.dart" show Contact, ContactsModel, contactsModel;
@@ -178,9 +179,34 @@ class ContactsList extends StatelessWidget {
             body: ListView.builder(
               itemCount: contactsModel.entityList.length,
               itemBuilder: (BuildContext context, int index){
-                Contact contact: contactsModel.entityList[index];
+                Contact contact = contactsModel.entityList[index];
                 File avatarFile = File(join(utils.docsDir.path, contact.id.toString()));
                 bool avatarFileExists = avatarFile.existsSync();
+                return Column(
+                  children: [
+                    Slidable(
+                      // delegate : SlidableDrawerDelegate(),
+                      actionExtentRatio: .25,
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.indigoAccent,
+                          foregroundColor: Colors.white,
+                          backgroundImage: avatarFileExists ? FileImage(avatarFile) : null,
+                          child: avatarFileExists ? null : Text(contact.name.substring(0, 1).toUpperCase()),
+                        ),
+                        title: Text("${contact.name}"),
+                        subtitle: contact.phone == null ? null : Text("${contact.phone}"),
+                        onTap: () async{
+                          File avatarFile = File(join(utils.docsDir.path, "avatar"));
+                          if (avatarFile.existsSync()){
+                            avatarFile.deleteSync();
+                          }
+                          contactsModel.entityBeingEdited =await ContactsDBWorker.db.get(contact.id);
+                        },
+                      ),
+                    ),
+                  ],
+                );
               }
             ),
           );
