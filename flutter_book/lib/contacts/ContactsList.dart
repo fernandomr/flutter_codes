@@ -13,7 +13,7 @@ import "ContactsModel.dart" show Contact, ContactsModel, contactsModel;
 
 class ContactsList extends StatelessWidget {
 
-  Future _delete(BuildContext context, Contact pContact){
+  Future _delete(BuildContext context, Contact pContact) async {
     return showDialog(
         context: context,
         barrierDismissible: false,
@@ -29,6 +29,10 @@ class ContactsList extends StatelessWidget {
               ),
               FlatButton(child: Text("Delete"),
                 onPressed: () async {
+                  File avatarFile = File(join(utils.docsDir.path, pContact.id.toString()));
+                  if (avatarFile.existsSync()) {
+                    avatarFile.deleteSync();
+                  }
                   await ContactsDBWorker.db.delete(pContact.id);
                   Navigator.of(alertContext).pop();
                   Scaffold.of(context).showSnackBar(
@@ -201,10 +205,26 @@ class ContactsList extends StatelessWidget {
                           if (avatarFile.existsSync()){
                             avatarFile.deleteSync();
                           }
-                          contactsModel.entityBeingEdited =await ContactsDBWorker.db.get(contact.id);
+                          contactsModel.entityBeingEdited = await ContactsDBWorker.db.get(contact.id);
+                          if (contactsModel.entityBeingEdited.birthday == null){
+                            contactsModel.setChosenDate(null);
+                          } else {
+                            List dateParts = contactsModel.entityBeingEdited.birthday.split(',');
+                            DateTime birthday = DateTime(int.parse(dateParts[0]), int.parse(dateParts[1]), int.parse(dateParts[2]));
+                            contactsModel.setChosenDate(DateFormat.yMMMMd("en_US").format(birthday.toLocal()));
+                          }
+                          contactsModel.setStackIndex(1);
                         },
+
                       ),
+                      secondaryActions: [
+                        IconSlideAction(caption: "Delete", color: Colors.red,
+                          icon: Icons.delete,
+                          onTap: () => _delete(context, contact),
+                        ),
+                      ],
                     ),
+                    Divider(),
                   ],
                 );
               }
