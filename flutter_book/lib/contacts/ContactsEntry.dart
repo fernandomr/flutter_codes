@@ -2,6 +2,7 @@
 import 'dart:html';
 import 'dart:io';
 import "package:flutter/material.dart";
+import 'package:image_picker/image_picker.dart';
 import "package:scoped_model/scoped_model.dart";
 import "ContactsDBWorker.dart";
 import "ContactsModel.dart" show ContactsModel, contactsModel;
@@ -63,6 +64,32 @@ class ContactsEntry extends StatelessWidget{
     }
   }
 
+  Future _selectAvatar(BuildContext context){
+    return showDialog(
+      context: context,
+      builder: (BuildContext context){
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                GestureDetector(child: Text("Take a picture"),
+                  onTap: () async{
+                    var cameraImage = await ImagePicker.platform.pickImage(source: ImageSource.camera);
+                    if (cameraImage != null){
+                      cameraImage.copySync(join(utils.docsDir.path, "avatar"));
+                      contactsModel.triggerRebuild();
+                    }
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            ),
+          ),
+        );
+      }
+    );
+  }
+
   Widget build(BuildContext context){
     _titleEditingController.text = contactsModel.entityBeingEdited.title;
     _contentEditingController.text = contactsModel.entityBeingEdited.content;
@@ -116,33 +143,50 @@ class ContactsEntry extends StatelessWidget{
                       ),
                     ),
                     ListTile(
-                      leading: Icon(Icons.today),
-                      title: Text("Due date"),
-                      subtitle: Text(
-                          contactsModel.chosenDate == null ? "" : contactsModel.chosenDate
-                      ),
-                      trailing: IconButton(
-                        icon: Icon(Icons.edit), color: Colors.blue,
-                        onPressed: () async{
-                          String chosenDate = await utils.selectDate(
-                              context, contactsModel, contactsModel.entityBeingEdited.dueDate
-                          );
-                          if (chosenDate != null){
-                            contactsModel.entityBeingEdited.dueDate = chosenDate;
+                      leading: Icon(Icons.person),
+                      title: TextFormField(
+                        decoration: InputDecoration(hintText: "Name"),
+                        controller: _nameEditingController,
+                        validator: (String value){
+                          if (value.length == 0){
+                            return "Please enter a name";
                           }
+                          return null;
                         },
                       ),
                     ),
                     ListTile(
-                      leading: Icon(Icons.alarm),
-                      title: Text("Time"),
-                      subtitle: Text(contactsModel.apptTime == null ? "" : contactsModel.apptTime),
-                      trailing: IconButton(
-                        icon:  Icon(Icons.edit),
-                        color: Colors.blue,
-                        onPressed: () => _selectTime(context),
+                      leading: Icon(Icons.phone),
+                      title: TextFormField(
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(hintText: "Phone"),
+                        controller: _phoneEditingController,
                       ),
                     ),
+                    ListTile(
+                      leading: Icon(Icons.email),
+                      title: TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(hintText: "Email"),
+                        controller: _emailEditingController,
+                      ),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.today),
+                      title: Text("Birthday"),
+                      subtitle: Text(contactsModel.chosenDate == null ? "" : contactsModel.chosenDate),
+                      trailing: IconButton(
+                        icon: Icon(Icons.edit),
+                        color: Colors.blue,
+                        onPressed: () async{
+                          String chosenDate = await utils.selectDate(
+                              context, contactsModel, contactsModel.entityBeingEdited.birthday);
+                          if (chosenDate != null){
+                            contactsModel.entityBeingEdited.birthday = chosenDate;
+                          }
+                        },
+                      ),
+                    )
                   ],
                 ),
               ),
