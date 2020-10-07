@@ -1,6 +1,7 @@
 
-import "package:flutter/material.dart";
 import 'dart:io';
+import 'package:path/path.dart';
+import "package:flutter/material.dart";
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/classes/event_list.dart';
@@ -63,16 +64,16 @@ class ContactsList extends StatelessWidget {
           int.parse(dateParts[2])
       );
       contactsModel.setChosenDate(DateFormat.yMMMMd("en_US").format(apptDate.toLocal()));
-      if (contactsModel.entityBeingEdited.apptTime == null){
-        contactsModel.setApptTime(null);
-      } else {
-        List timeParts =contactsModel.entityBeingEdited.apptTime.split(",");
-        TimeOfDay apptTime = TimeOfDay(
-            hour: int.parse(timeParts[0]),
-            minute: int.parse(timeParts[1])
-        );
-        contactsModel.setApptTime(apptTime.format(context));
-      }
+      // if (contactsModel.entityBeingEdited.apptTime == null){
+      //   contactsModel.setApptTime(null);
+      // } else {
+      //   List timeParts =contactsModel.entityBeingEdited.apptTime.split(",");
+      //   TimeOfDay apptTime = TimeOfDay(
+      //       hour: int.parse(timeParts[0]),
+      //       minute: int.parse(timeParts[1])
+      //   );
+      //   contactsModel.setApptTime(apptTime.format(context));
+      // }
 
       contactsModel.setStackIndex(1);
       Navigator.pop(context);
@@ -101,17 +102,17 @@ class ContactsList extends StatelessWidget {
                                     itemCount: contactsModel.entityList.length,
                                     itemBuilder: (BuildContext context, int index){
                                       Contact appointment = contactsModel.entityList[index];
-                                      if (appointment.apptDate !="${date.year},${date.month},${date.day}"){
-                                        return Container(height : 0);
-                                      }
-                                      String apptTime = "";
-                                      if (appointment.apptTime != null){
-                                        List timeParts = appointment.apptTime.split(",");
-                                        TimeOfDay at = TimeOfDay(
-                                            hour : int.parse(timeParts[0]),
-                                            minute : int.parse(timeParts[1]));
-                                        apptTime = " (${at.format(context)})";
-                                      }
+                                      // if (appointment.apptDate !="${date.year},${date.month},${date.day}"){
+                                      //   return Container(height : 0);
+                                      // }
+                                      // String apptTime = "";
+                                      // if (appointment.apptTime != null){
+                                      //   List timeParts = appointment.apptTime.split(",");
+                                      //   TimeOfDay at = TimeOfDay(
+                                      //       hour : int.parse(timeParts[0]),
+                                      //       minute : int.parse(timeParts[1]));
+                                      //   apptTime = " (${at.format(context)})";
+                                      // }
 
                                       return Slidable(
                                         // delegate : SlidableDrawerDelegate()
@@ -120,8 +121,8 @@ class ContactsList extends StatelessWidget {
                                           margin: EdgeInsets.only(bottom : 8),
                                           color : Colors.grey.shade300,
                                           child: ListTile(
-                                            title : Text("${appointment.title}$apptTime"),
-                                            subtitle : appointment.description == null ? null : Text("${appointment.description}"),
+                                            title : Text("${appointment.name}"),
+                                            subtitle : appointment.email == null ? null : Text("${appointment.email}"),
                                             onTap: () async{
                                               _edit(context, appointment);
                                             },
@@ -153,14 +154,14 @@ class ContactsList extends StatelessWidget {
   Widget build(BuildContext context){
     EventList<Event> _markedDateMap = EventList();
 
-    for(int i = 0; i < contactsModel.entityList.length; i++){
-      Contact appointment = ContactsModel().entityList[i];
-      List dateParts = appointment.apptDate.split(",");
-      DateTime apptDate = DateTime(int.parse(dateParts[0]), int.parse(dateParts[1]),int.parse(dateParts[2]));
-      _markedDateMap.add(apptDate, Event(date: apptDate,
-          icon: Container(decoration: BoxDecoration(color: Colors.blue))
-      ));
-    }
+    // for(int i = 0; i < contactsModel.entityList.length; i++){
+    //   Contact appointment = ContactsModel().entityList[i];
+    //   List dateParts = appointment.apptDate.split(",");
+    //   DateTime apptDate = DateTime(int.parse(dateParts[0]), int.parse(dateParts[1]),int.parse(dateParts[2]));
+    //   _markedDateMap.add(apptDate, Event(date: apptDate,
+    //       icon: Container(decoration: BoxDecoration(color: Colors.blue))
+    //   ));
+    // }
 
     return ScopedModel<ContactsModel>(
       model: contactsModel,

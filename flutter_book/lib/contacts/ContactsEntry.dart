@@ -1,26 +1,31 @@
 
-import 'dart:html';
 import 'dart:io';
+import 'package:path/path.dart';
 import "package:flutter/material.dart";
 import 'package:image_picker/image_picker.dart';
 import "package:scoped_model/scoped_model.dart";
-import "ContactsDBWorker.dart";
+import 'ContactsDBWorker.dart';
 import "ContactsModel.dart" show ContactsModel, contactsModel;
 import '../utils.dart' as utils;
 
 class ContactsEntry extends StatelessWidget{
 
-  final TextEditingController _titleEditingController = TextEditingController();
-  final TextEditingController _contentEditingController = TextEditingController();
+  final TextEditingController _nameEditingController = TextEditingController();
+  final TextEditingController _phoneEditingController = TextEditingController();
+  final TextEditingController _emailEditingController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TasksEntry(){
-    _titleEditingController.addListener(() {
-      contactsModel.entityBeingEdited.title = _titleEditingController.text;
+    _nameEditingController.addListener(() {
+      contactsModel.entityBeingEdited.name = _nameEditingController.text;
     });
 
-    _contentEditingController.addListener(() {
-      contactsModel.entityBeingEdited.content = _contentEditingController.text;
+    _phoneEditingController.addListener(() {
+      contactsModel.entityBeingEdited.phone = _phoneEditingController.text;
+    });
+
+    _emailEditingController.addListener(() {
+      contactsModel.entityBeingEdited.email = _emailEditingController.text;
     });
   }
 
@@ -30,38 +35,25 @@ class ContactsEntry extends StatelessWidget{
       return;
     }
 
+    var id = pContact.entityBeingEdited.id;
     if (pContact.entityBeingEdited.id == null){
-      await ContactsDBWorker.db.create(contactsModel.entityBeingEdited);
+      id = await ContactsDBWorker.db.create(contactsModel.entityBeingEdited);
     } else {
       await ContactsDBWorker.db.update(contactsModel.entityBeingEdited);
     }
 
-    contactsModel.loadData("notes", ContactsDBWorker.db);
+    File avatarFile = File(join(utils.docsDir.path, id.toString()));
+    if (avatarFile.existsSync()){
+      avatarFile.renameSync(join(utils.docsDir.path, id.toString()));
+    }
+
+    contactsModel.loadData("contacts", ContactsDBWorker.db);
 
     pContact.setStackIndex(0);
 
     Scaffold.of(context).showSnackBar(
         SnackBar(backgroundColor: Colors.green, duration: Duration(seconds: 2), content: Text("Contact saved"))
     );
-  }
-
-  Future _selectTime(BuildContext context) async{
-    TimeOfDay initialTime = TimeOfDay.now();
-
-    if (contactsModel.entityBeingEdited.apptTime != null){
-      List timeParts = contactsModel.entityBeingEdited.apptTime.split(",");
-      initialTime = TimeOfDay(
-          hour: int.parse(timeParts[0]),
-          minute: int.parse(timeParts[1])
-      );
-    }
-
-    TimeOfDay picked = await showTimePicker(context: context, initialTime: initialTime);
-
-    if (picked != null){
-      contactsModel.entityBeingEdited.apptTime = "${picked.hour},${picked.minute}";
-      contactsModel.setApptTime(picked.format(context));
-    }
   }
 
   Future _selectAvatar(BuildContext context){
@@ -72,16 +64,39 @@ class ContactsEntry extends StatelessWidget{
           content: SingleChildScrollView(
             child: ListBody(
               children: [
-                GestureDetector(child: Text("Take a picture"),
+                GestureDetector(
+                  child: Text("Take a picture"),
                   onTap: () async{
-                    var cameraImage = await ImagePicker.platform.pickImage(source: ImageSource.camera);
+                    var imagePicker = new ImagePicker();
+                    // var cameraImage = await ImagePicker.platform.pickImage(source: ImageSource.gallery);
+                    var cameraImage = await imagePicker.getImage(source: ImageSource.camera);
                     if (cameraImage != null){
-                      cameraImage.copySync(join(utils.docsDir.path, "avatar"));
+                      //cameraImage.copySync(join(utils.docsDir.path, "avatar"));
+                      File tmpFile = File(cameraImage.path);
+                      if (tmpFile.existsSync()){
+                        tmpFile.renameSync(join(utils.docsDir.path, "avatar"));
+                      }
                       contactsModel.triggerRebuild();
                     }
                     Navigator.of(context).pop();
                   },
-                )
+                ),
+                GestureDetector(
+                  child: Text("Sellect from gallery"),
+                  onTap: () async{
+                    var imagePicker = new ImagePicker();
+                    var galleryImage = await imagePicker.getImage(source: ImageSource.gallery);
+                    if (galleryImage != null){
+                      // galleryImage.copySync(join(utils.docsDir.path, "avatar"));
+                      File tmpFile = File(galleryImage.path);
+                      if (tmpFile.existsSync()){
+                        tmpFile.renameSync(join(utils.docsDir.path, "avatar"));
+                      }
+                      contactsModel.triggerRebuild();
+                    }
+                    Navigator.of(context).pop();
+                  },
+                ),
               ],
             ),
           ),
@@ -91,8 +106,9 @@ class ContactsEntry extends StatelessWidget{
   }
 
   Widget build(BuildContext context){
-    _titleEditingController.text = contactsModel.entityBeingEdited.title;
-    _contentEditingController.text = contactsModel.entityBeingEdited.content;
+    _nameEditingController.text = contactsModel.entityBeingEdited.name;
+    _phoneEditingController.text = contactsModel.entityBeingEdited.phone;
+    _emailEditingController.text = contactsModel.entityBeingEdited.email;
 
     return ScopedModel(
         model: contactsModel,

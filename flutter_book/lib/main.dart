@@ -47,6 +47,11 @@ class FlutterBook extends StatelessWidget {
               ],
             ),
           ),
+          body: TabBarView(
+            children: [
+              Appointments(), Contacts(), Notes(), Tasks()
+            ],
+          ),
         ),
       ),
     );
