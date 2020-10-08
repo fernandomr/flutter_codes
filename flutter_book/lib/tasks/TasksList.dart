@@ -69,7 +69,7 @@ class TasksList extends StatelessWidget {
 
                   return Slidable(
                       actionExtentRatio: .25,
-                      actionPane: null,
+                      actionPane: SlidableDrawerActionPane(),
                       child: ListTile(
                         leading: Checkbox(
                           value: task.completed == "true" ? true : false,
@@ -81,6 +81,7 @@ class TasksList extends StatelessWidget {
                         ),
                         title: Text(
                           "${task.description}",
+                            // "${task.description}",
                           style: task.completed == "true" ?
                             TextStyle(color: Theme.of(context).disabledColor,
                               decoration: TextDecoration.lineThrough

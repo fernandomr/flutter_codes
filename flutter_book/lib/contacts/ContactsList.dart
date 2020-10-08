@@ -191,14 +191,15 @@ class ContactsList extends StatelessWidget {
                   children: [
                     Slidable(
                       // delegate : SlidableDrawerDelegate(),
+                      actionPane: SlidableDrawerActionPane(),
                       actionExtentRatio: .25,
                       child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.indigoAccent,
-                          foregroundColor: Colors.white,
-                          backgroundImage: avatarFileExists ? FileImage(avatarFile) : null,
-                          child: avatarFileExists ? null : Text(contact.name.substring(0, 1).toUpperCase()),
-                        ),
+                        // leading: CircleAvatar(
+                        //   backgroundColor: Colors.indigoAccent,
+                        //   foregroundColor: Colors.white,
+                        //   backgroundImage: avatarFileExists ? FileImage(avatarFile) : null,
+                        //   child: avatarFileExists ? null : Text(contact.name.substring(0, 1).toUpperCase()),
+                        // ),
                         title: Text("${contact.name}"),
                         subtitle: contact.phone == null ? null : Text("${contact.phone}"),
                         onTap: () async{

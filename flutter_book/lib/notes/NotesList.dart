@@ -74,6 +74,7 @@ class NotesList extends StatelessWidget {
                     child: Slidable(
                       // delegate: SlidableDrawerDelegate,
                       actionExtentRatio: .25,
+                      actionPane: SlidableDrawerActionPane(),
                       secondaryActions: [
                         IconSlideAction(
                           caption: "Delete",

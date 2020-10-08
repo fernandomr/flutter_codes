@@ -109,6 +109,7 @@ class AppointmentsList extends StatelessWidget {
 
                                 return Slidable(
                                     // delegate : SlidableDrawerDelegate()
+                                  actionPane: SlidableDrawerActionPane(),
                                   actionExtentRatio: .25,
                                   child: Container(
                                     margin: EdgeInsets.only(bottom : 8),

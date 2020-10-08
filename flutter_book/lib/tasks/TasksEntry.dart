@@ -7,17 +7,17 @@ import '../utils.dart' as utils;
 
 class TasksEntry extends StatelessWidget{
 
-  final TextEditingController _titleEditingController = TextEditingController();
+  final TextEditingController _descriptionEditController = TextEditingController();
   final TextEditingController _contentEditingController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TasksEntry(){
-    _titleEditingController.addListener(() {
-      tasksModel.entityBeingEdited.title = _titleEditingController.text;
+    _descriptionEditController.addListener(() {
+      tasksModel.entityBeingEdited.description = _descriptionEditController.text;
     });
 
     _contentEditingController.addListener(() {
-      tasksModel.entityBeingEdited.content = _contentEditingController.text;
+      tasksModel.entityBeingEdited.dueDate = _contentEditingController.text;
     });
   }
 
@@ -43,8 +43,8 @@ class TasksEntry extends StatelessWidget{
   }
 
   Widget build(BuildContext context){
-    _titleEditingController.text = tasksModel.entityBeingEdited.title;
-    _contentEditingController.text = tasksModel.entityBeingEdited.content;
+    _descriptionEditController.text = tasksModel.entityBeingEdited.description;
+    _contentEditingController.text = tasksModel.entityBeingEdited.dueDate;
 
     return ScopedModel(
         model: tasksModel,
@@ -59,7 +59,7 @@ class TasksEntry extends StatelessWidget{
                       leading: Icon(Icons.title),
                       title: TextFormField(
                         decoration: InputDecoration(hintText: "Title"),
-                        controller: _titleEditingController,
+                        controller: _descriptionEditController,
                         validator: (String value){
                           if (value.length == 0){
                             return "Please enter a title";
