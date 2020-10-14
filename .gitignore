@@ -39,3 +39,5 @@
 
 # Obfuscation related
 **/app.*.map.json
+
+*/node_modules
