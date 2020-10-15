@@ -94,7 +94,17 @@ io.on("connection", io => {
 		inCallBack(rooms);
 	});
 
-	//
+	// remove user from room handler
+	io.on("kick", (inData, inCallBack) => {
+		
+		const room = rooms[inData.roomName];
+		const users = room.users;
+
+		delete users[inData.userName];
+
+		io.broadcast.emit("kicked", room);
+		inCallBack({status: "ok"});
+	});
 
 });
 
