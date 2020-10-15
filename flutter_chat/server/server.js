@@ -49,6 +49,7 @@ io.on("connection", io => {
 		inCallBack(users);
 	});
 
+	// user join room handler
 	io.on("join", (inData, inCallBack) => {
 		const room = rooms[inData.roomName];
 
@@ -60,6 +61,40 @@ io.on("connection", io => {
 			inCallBack({ status: "joined", room: room});
 		}
 	});
+
+	// post message handler
+	io.on("post", (inData, inCallBack) => {
+		io.broadcast.emit("posted", inData);
+		inCallBack({status: "ok"});
+	});
+
+	// invite user to room handler
+	io.on("invite", (inData, inCallBack) => {
+		io.broadcast.emit("invited", inData);
+		inCallBack({status: "ok"});
+	});
+
+	// user leaves room handler
+	io.on("leave", (inData, inCallBack) => {
+
+		const room = rooms[inData.roomName];
+		delete room.users[inData.userName];
+		
+		io.broadcast.emit("left", room);
+		inCallBack({status: "ok"});
+	});
+
+	// close room handler
+	io.on("close", (inData, inCallBack) => {
+		
+		delete rooms[inData.roomName];
+		io.broadcast.emit("closed", 
+			{ roomName: inData.roomName, rooms: rooms}
+		);
+		inCallBack(rooms);
+	});
+
+	//
 
 });
 
