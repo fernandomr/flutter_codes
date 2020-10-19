@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class BaseModel extends Model {
+class FlutterChatModel extends Model {
 
   BuildContext rootBuildContext;
   Directory docsDir;
@@ -62,5 +62,39 @@ class BaseModel extends Model {
     roomList = rooms;
     notifyListeners();
   }
+  
+  void setUserList(final Map pUserList){
+    List users = [];
+    for (String userName in pUserList.keys){
+      Map user = pUserList[userName];
+      users.add(user);
+    }
+    userList = users;
+    notifyListeners();
+  }
+
+  void setCurrentRoomUserList(final Map pUserList){
+    List users = [];
+    for (String userName in pUserList.keys){
+      Map user = pUserList[userName];
+      users.add(user);
+    }
+    currentRoomUserList = users;
+    notifyListeners();
+  }
+
+  void addRoomInvite(final String pRoomName){
+    roomInvites[pRoomName] = true;
+  }
+
+  void removeRoomInvite(final String pRoomName){
+    roomInvites.remove(pRoomName);
+  }
+
+  void clearCurrentRoomMessages(){
+    currentRoomMessages = [];
+  }
 
 }
+
+FlutterChatModel model = FlutterChatModel();
