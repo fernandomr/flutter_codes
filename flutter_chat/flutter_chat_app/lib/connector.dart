@@ -15,8 +15,30 @@ void showPleaseWait(){
         child: Container(width: 150, height: 150,
           alignment: AlignmentDirectional.center,
           decoration: BoxDecoration(color: Colors.blue[200]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(child: SizedBox(height: 50, width: 50,
+                child: CircularProgressIndicator(
+                  value: null, strokeWidth: 10,
+                ),
+              )),
+              Container(margin: EdgeInsets.only(top: 20),
+                child: Center(child:
+                  Text("Please wait, contacting server...",
+                      style: new TextStyle(color: Colors.white)
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       );
     }
   );
+}
+
+void hidePleaseWait(){
+  Navigator.of(model.rootBuildContext).pop();
 }
