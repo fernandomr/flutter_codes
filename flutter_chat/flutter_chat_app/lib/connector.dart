@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/flutterChatModel.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
@@ -41,4 +43,47 @@ void showPleaseWait(){
 
 void hidePleaseWait(){
   Navigator.of(model.rootBuildContext).pop();
+}
+
+void connectToServer(final BuildContext pMainBuildContext, final Function inCallback){
+  _io = SocketIOManager().createSocketIO(
+    serverURL, "/", query: "",
+    socketStatusCallback: (inData) {
+      if (inData == "connect"){
+        _io.subscribe("newUser", newUser);
+        _io.subscribe("created", created);
+        _io.subscribe("closed", closed);
+        _io.subscribe("joined", joined);
+        _io.subscribe("left", left);
+        _io.subscribe("kicked", kicked);
+        _io.subscribe("invited", invited);
+        _io.subscribe("posted", posted);
+        inCallback();
+      }
+    }
+  );
+  _io.init();
+  _io.connect();
+}
+
+void validate(final String inUserName, final String inPassword, final Function inCallback){
+  showPleaseWait();
+  _io.sendMessage(
+      "validate",
+      "{\"userName\" : \"$inUserName\", \"password\" : \"$inPassword\" }",
+      (inData) {
+        Map<String, dynamic> response = jsonDecode(inData);
+        hidePleaseWait();
+        inCallback(response["status"]);
+      }
+  );
+}
+
+void listRooms(final Function inCallback){
+  showPleaseWait();
+  _io.sendMessage("listRooms", "{}", (inData) {
+    Map<String, dynamic> response = jsonDecode(inData);
+    hidePleaseWait();
+    inCallback(response);
+  });
 }
