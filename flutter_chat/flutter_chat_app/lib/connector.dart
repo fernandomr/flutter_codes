@@ -87,3 +87,41 @@ void listRooms(final Function inCallback){
     inCallback(response);
   });
 }
+
+void create(final String pRoomName, final String pRoomDescriptor, final int pMaxNumber,
+  final bool pIsPrivate, final pUserName, final Function pCallBack){
+
+}
+
+void join(final String pRoomName, final String pUserName, final Function pCallBack){
+
+}
+
+void leave(final String pRoomName, final String pUserName, final Function pCallBack){
+
+}
+
+void listUsers(final Function pCallBack){
+
+}
+
+void invite(final String pRoomName, final String pUserName, final String pInvitingUser, final Function pCallBack){
+
+}
+
+void post(final String pRoomName, final String pUserName, final String pMessage, final Function pCallBack){
+
+}
+
+void close(final String pRoomName, final Function pCallBack){
+
+}
+
+void kick(final String pRoomName, final String pUserName, final Function pCallBack){
+
+}
+
+void newUser(inData){
+  Map<String, dynamic> payload = jsonDecode(inData);
+  model.setUserList(payload);
+}
