@@ -125,3 +125,22 @@ void newUser(inData){
   Map<String, dynamic> payload = jsonDecode(inData);
   model.setUserList(payload);
 }
+
+void created(inData){
+  Map<String, dynamic> payload = jsonDecode(inData);
+  model.setRoomList(payload);
+}
+
+void closed(inData){
+  Map<String, dynamic> payload = jsonDecode(inData);
+  model.setRoomList(payload);
+
+  if(payload["roomName"] == model.currentRoomName){
+    model.removeRoomInvite(payload["roomName"]);
+    model.setCurrentRoomUserList({});
+    model.setCurrentRoom(FlutterChatModel.DEFAULT_ROOM_NAME);
+    model.setCurrentRoomEnabled(false);
+    model.setGreetings("The room was closed by its creator");
+    Navigator.of(model.rootBuildContext).pushNamedAndRemoveUntil("/", ModalRoute.withName("/"));
+  }
+}
