@@ -144,3 +144,47 @@ void closed(inData){
     Navigator.of(model.rootBuildContext).pushNamedAndRemoveUntil("/", ModalRoute.withName("/"));
   }
 }
+
+void joined(inData){
+  Map<String, dynamic> payload = jsonDecode(inData);
+  if (model.currentRoomName == payload["roomName"]){
+    model.setCurrentRoomUserList(payload["users"]);
+  }
+}
+
+void left(inData){
+  Map<String, dynamic> payload = jsonDecode(inData);
+  if (model.currentRoomName == payload["roomName"]){
+    model.setCurrentRoomUserList(payload["users"]);
+  }
+}
+
+void kicked(inData){
+  Map<String, dynamic> payload = jsonDecode(inData);
+  model.setRoomList(payload);
+
+  if(payload["roomName"] == model.currentRoomName){
+    model.removeRoomInvite(payload["roomName"]);
+    model.setCurrentRoomUserList({});
+    model.setCurrentRoom(FlutterChatModel.DEFAULT_ROOM_NAME);
+    model.setCurrentRoomEnabled(false);
+    model.setGreetings("You've been removed from the room");
+    Navigator.of(model.rootBuildContext).pushNamedAndRemoveUntil("/", ModalRoute.withName("/"));
+  }
+}
+
+void invited(inData) async {
+  Map<String, dynamic> payload = jsonDecode(inData);
+  String roomName = payload["roomName"];
+  String inviterName = payload["inviterName"];
+  model.addRoomInvite(roomName);
+  Scaffold.of(model.rootBuildContext).showSnackBar(
+    SnackBar(
+      backgroundColor: Colors.amber,
+      duration: Duration(seconds: 60),
+      content: Text("You've been invited to the room '$roomName' by user '$inviterName',\n\n "
+          "You can enter the room from the lobby"),
+      action: SnackBarAction(label: "Ok", onPressed: () {},),
+    ),
+  );
+}
