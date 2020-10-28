@@ -188,3 +188,10 @@ void invited(inData) async {
     ),
   );
 }
+
+void posted(inData){
+  Map<String, dynamic> payload = jsonDecode(inData);
+  if (model.currentRoomName == payload["roomName"]){
+    model.addMessage(payload["userName"], payload["message"]);
+  }
+}
