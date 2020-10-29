@@ -6,35 +6,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(FlutterChatMain());
 }
 
-class MyApp extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Chat',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: Scaffold(body: FlutterChatMain()),
-    );
-  }
-}
-
-class FlutterChatMain extends StatefulWidget {
-  FlutterChatMain({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _FlutterChatMainState createState() => _FlutterChatMainState();
-}
-
-class _FlutterChatMainState extends State<FlutterChatMain> {
-
+class FlutterChatMain extends StatelessWidget {
   void startUp() async {
     Directory docsDir = await getApplicationDocumentsDirectory();
     model.docsDir = docsDir;
@@ -62,8 +37,26 @@ class _FlutterChatMainState extends State<FlutterChatMain> {
     model.rootBuildContext = context;
     startUp();
 
-    return ScopedModelDescendant<FlutterChatModel>(
-      builder:  ,
-        model: null, child: null);
+    return ScopedModel<FlutterChatModel>(
+      model: model,
+      child: ScopedModelDescendant<FlutterChatModel>(
+          builder: (
+              BuildContext context,
+              Widget inChild,
+              FlutterChatModel inModel
+              ) {
+            return MaterialApp(
+              initialRoute: "/",
+              routes: {
+                "/Lobby": (screenContext) => Lobby(),
+                "/Room": (screenContext) => Room(),
+                "/UserList": (screenContext) => UserList(),
+                "/CreateRoom": (screenContext) => CreateRoom(),
+              },
+              home: Home(),
+            );
+          }
+      ),
+    );
   }
 }
