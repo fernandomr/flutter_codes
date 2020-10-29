@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/flutterChatModel.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 void main() {
   runApp(MyApp());
@@ -58,22 +59,11 @@ class _FlutterChatMainState extends State<FlutterChatMain> {
 
   @override
   Widget build(BuildContext context) {
+    model.rootBuildContext = context;
     startUp();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'App being built',
-            ),
-          ],
-        ),
-      ),
-    );
+    return ScopedModelDescendant<FlutterChatModel>(
+      builder:  ,
+        model: null, child: null);
   }
 }
